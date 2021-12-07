@@ -31,7 +31,7 @@ class Main extends PluginBase implements Listener {
 				break;
 			default:
 				$this->getLogger()->error('Invalid mode selected, must be either "blacklist" or "whitelist"! Disabling...');
-				$this->setEnabled(false);
+				$this->getServer()->getPluginManager()->disablePlugin($this);
 				return;
 		}
 
@@ -47,11 +47,17 @@ class Main extends PluginBase implements Listener {
 		// $packet = $event->getPacket();
 		foreach($event->getPackets() as $packet) {
 			if ($packet instanceof AvailableCommandsPacket) {
-				if ($event->getPlayer()->hasPermission("hidecommands.unhide")) return;
-				if ($this->mode === self::MODE_WHITELIST) {
-					$packet->commandData = array_intersect_key($packet->commandData, $this->commandList);
-				} else {
-					$packet->commandData = array_diff_key($packet->commandData, $this->commandList);
+				foreach ($event->getTargets() as $target) {
+					$player = $target->getPlayer();
+
+					if ($player === null) continue;
+					if ($player->hasPermission("hidecommands.unhide")) continue;
+
+					if ($this->mode === self::MODE_WHITELIST) {
+						$packet->commandData = array_intersect_key($packet->commandData, $this->commandList);
+					} else {
+						$packet->commandData = array_diff_key($packet->commandData, $this->commandList);
+					}
 				}
 			}
 		}

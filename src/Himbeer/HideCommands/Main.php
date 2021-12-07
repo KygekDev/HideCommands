@@ -14,10 +14,8 @@ class Main extends PluginBase implements Listener {
 	private const MODE_WHITELIST = 0;
 	private const MODE_BLACKLIST = 1;
 
-	/** @var int */
-	private $mode;
-	/** @var array */
-	private $commandList = [];
+	private int $mode;
+	private array $commandList = [];
 
 	public function onEnable(): void {
 		$this->saveDefaultConfig();
@@ -44,7 +42,6 @@ class Main extends PluginBase implements Listener {
 	}
 
 	public function onDataPacketSend(DataPacketSendEvent $event) {
-		// $packet = $event->getPacket();
 		foreach ($event->getPackets() as $packet) {
 			if ($packet instanceof AvailableCommandsPacket) {
 				foreach ($event->getTargets() as $target) {

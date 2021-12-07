@@ -19,7 +19,7 @@ class Main extends PluginBase implements Listener {
 	/** @var array */
 	private $commandList = [];
 
-	public function onEnable() {
+	public function onEnable() : void {
 		$this->saveDefaultConfig();
 
 		switch ($this->getConfig()->get("mode")) {
@@ -44,13 +44,15 @@ class Main extends PluginBase implements Listener {
 	}
 
 	public function onDataPacketSend(DataPacketSendEvent $event) {
-		$packet = $event->getPacket();
-		if ($packet instanceof AvailableCommandsPacket) {
-			if ($event->getPlayer()->hasPermission("hidecommands.unhide")) return;
-			if ($this->mode === self::MODE_WHITELIST) {
-				$packet->commandData = array_intersect_key($packet->commandData, $this->commandList);
-			} else {
-				$packet->commandData = array_diff_key($packet->commandData, $this->commandList);
+		// $packet = $event->getPacket();
+		foreach($event->getPackets() as $packet) {
+			if ($packet instanceof AvailableCommandsPacket) {
+				if ($event->getPlayer()->hasPermission("hidecommands.unhide")) return;
+				if ($this->mode === self::MODE_WHITELIST) {
+					$packet->commandData = array_intersect_key($packet->commandData, $this->commandList);
+				} else {
+					$packet->commandData = array_diff_key($packet->commandData, $this->commandList);
+				}
 			}
 		}
 	}
